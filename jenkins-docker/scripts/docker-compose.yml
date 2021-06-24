@@ -1,0 +1,64 @@
+version: '3.7'
+
+services:
+
+#-------------------Jenkins-2-Service-------------------
+  jenkins2-master:
+    image: 'jenkins:2.60.3'
+    hostname: jenkins2-master
+    container_name: jenkins2-master
+    restart: unless-stopped
+    environment:
+    # You might need to customize the JVM running Jenkins, typically to pass system properties or tweak heap memory settings. 
+    # Use JAVA_OPTS environment variable for this purpose.
+      - "JAVA_OPTS=-Djava.util.logging.config.file=/var/jenkins_home/log.properties"
+    # You also can define jenkins arguments as JENKINS_OPTS. 
+    # This is useful to define a set of arguments to pass to jenkins launcher as you define a derived jenkins image 
+    # based on the official one with some customized settings. 
+      - "JENKINS_OPTS=--httpPort=8080"
+    # You can also change the default slave agent port for jenkins by defining JENKINS_SLAVE_AGENT_PORT.
+      - "JENKINS_SLAVE_AGENT_PORT=50000"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+    # Jenkins will store the workspace in /var/jenkins_home. 
+    # All Jenkins data lives in there - including plugins and configuration. 
+    # Backing up data:
+    # If you bind mount in a volume - you can simply back up that directory (which is jenkins_home) at any time. 
+    # This is highly recommended. Treat the jenkins_home directory as you would a database - 
+    # in Docker you would generally put a database on a volume.
+      - './data/jenkins_home/:/var/jenkins_home/'
+    # View the generated administrator password to log in the first time.
+      - './data/secrets/:/var/jenkins_home/secrets/'
+    # You can specify and set the number of executors of your Jenkins master instance using a groovy script. 
+    # By default its set to 2 executors, but you can extend the image and change it to your desired number of executors.
+      - './jenkins/executors.groovy:/usr/share/jenkins/ref/init.groovy.d/executors.groovy'
+    # Jenkins logging can be configured through a properties file and java.util.logging.config.file Java property.
+      - './jenkins/log.properties:/var/jenkins_home/log.properties'
+    # Access Docker socket inside the Docker Container.
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/usr/local/bin/docker:/usr/local/bin/docker'
+    ports:
+      - 8080:8080
+    # You can run builds on the master (out of the box) but if you want to attach build slave servers: 
+    # make sure you map the port: -p 50000:50000 - which will be used when you connect a slave agent.
+      - 50000:50000
+    networks:
+      - docker-net
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4096M
+        reservations:
+          cpus: '0.001'
+          memory: 128M
+
+networks:
+  docker-net:
+    driver: bridge
