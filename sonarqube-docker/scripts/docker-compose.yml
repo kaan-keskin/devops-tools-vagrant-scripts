@@ -1,0 +1,78 @@
+version: '3.7'
+
+services:
+
+#-------------------PostgreSQL-and-Sonarqube-Services-------------------
+  postgres:
+    image: 'postgres:13.3-buster'
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    ports:
+      - '5432:5432'
+    networks:
+      - docker-net
+    volumes:
+      - './data/postgresql/:/var/lib/postgresql/'
+      - './data/postgresql_data/:/var/lib/postgresql/data/'
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=250"
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U postgres"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4096M
+        reservations:
+          cpus: '0.001'
+          memory: 128M
+  
+  sonarqube:
+    image: 'sonarqube:8.9.1-community'
+    hostname: sonarqube
+    container_name: sonarqube
+    restart: unless-stopped
+    environment: 
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    depends_on:
+      - postgres
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - './data/sonarqube_data/:/opt/sonarqube/data/'
+      - './data/sonarqube_logs/:/opt/sonarqube/logs/'
+      - './plugins/:/opt/sonarqube/extensions/plugins/'
+      #- './data/sonarqube_extensions/:/opt/sonarqube/extensions/'
+    ports:
+      - 9000:9000
+    networks:
+      - docker-net
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: '4096M'
+        reservations:
+          cpus: '0.001'
+          memory: 128M
+
+networks:
+  docker-net:
+    driver: bridge

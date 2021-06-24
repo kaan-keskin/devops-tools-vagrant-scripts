@@ -1,0 +1,5 @@
+{
+    "debug": true,
+    "registry-mirrors": ["http://docker.registry.company.com:8080/"],
+    "insecure-registries": ["docker.registry.company.com:8080/"]
+}

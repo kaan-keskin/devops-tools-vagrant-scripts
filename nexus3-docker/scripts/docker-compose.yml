@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+
+#-------------------Nexus-3-Service-------------------
+  nexus3:
+    image: 'sonatype/nexus3:3.31.0'
+    hostname: nexus3
+    container_name: nexus3
+    restart: unless-stopped
+    # Virtual Machine must have minimum 16Gb RAM and Nexus3 will be optimized 4G JVM memory limit.
+    # Further information can be found on Nexus 3 Documentation.
+    environment: 
+      - "INSTALL4J_ADD_VM_PARAMS=-Xms4G -Xmx4G -XX:MaxDirectMemorySize=6717m -Djava.util.prefs.userRoot=/nexus-data"
+      - "NEXUS_CONTEXT=/"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+    # Before using volume mapping, make sure that ./data/nexus-data/ folder owned by PID 200
+    # To do that: sudo chown -R 200 ./data/nexus-data 
+      - './data/nexus-data/:/nexus-data/'
+    ports:
+      - 8081:8081
+    networks:
+      - docker-net
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: '4096M'
+        reservations:
+          cpus: '0.001'
+          memory: 128M
+
+networks:
+  docker-net:
+    driver: bridge
