@@ -34,7 +34,7 @@ services:
     # in Docker you would generally put a database on a volume.
       - './data/jenkins_home/:/var/jenkins_home/'
     # View the generated administrator password to log in the first time.
-      - './data/secrets/:/var/jenkins_home/secrets/'
+    #  - './data/secrets/:/var/jenkins_home/secrets/'
     # You can specify and set the number of executors of your Jenkins master instance using a groovy script. 
     # By default its set to 2 executors, but you can extend the image and change it to your desired number of executors.
       - './jenkins/executors.groovy:/usr/share/jenkins/ref/init.groovy.d/executors.groovy'
