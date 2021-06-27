@@ -4,20 +4,37 @@ services:
 
 #-------------------Jenkins-2-Service-------------------
   jenkins2-master:
-    image: 'jenkins:2.60.3'
+    image: 'bitnami/jenkins:2.289.1'
     hostname: jenkins2-master
     container_name: jenkins2-master
     restart: unless-stopped
+    # For customizations, please note that this image is, by default, a non-root container using the user jenkins with uid=1001.
+    # user: jenkins
     environment:
-    # You might need to customize the JVM running Jenkins, typically to pass system properties or tweak heap memory settings. 
+    # Jenkins admin username. Default: user
+      - "JENKINS_USERNAME=admin"
+    # Jenkins admin password. Default: bitnami
+      - "JENKINS_PASSWORD=admin123"
+    #  Jenkins admin email. Default: user@example.com
+      - "JENKINS_EMAIL=admin@example.com"
+    #  Jenkins home directory. Default: /bitnami/jenkins/home
+      - "JENKINS_HOME=/bitnami/jenkins/home"
+    # Port used by Jenkins for HTTP. Default: 8080
+      - "JENKINS_HTTP_PORT_NUMBER=8080"
+    # Port used by Jenkins for HTTPS. Default: 8443
+      - "JENKINS_HTTPS_PORT_NUMBER=8443"
+    # Port to used by Jenkins to generate URLs and links when accessing using HTTP. Default: 80
+      - "JENKINS_EXTERNAL_HTTP_PORT_NUMBER=8080"
+    # Port to used by Jenkins to generate URLs and links when accessing using HTTPS. Default: 443
+      - "JENKINS_EXTERNAL_HTTPS_PORT_NUMBER=8443"
+    # Port used by Jenkins for JNLP. Default: 50000
+      - "JENKINS_JNLP_PORT_NUMBER=50000"
+    # Enable serving Jenkins through HTTPS instead of HTTP. Default: no
+      - "JENKINS_ENABLE_HTTPS=no"
+    # Skip performing the initial bootstrapping. Default: no
+      - "JENKINS_SKIP_BOOTSTRAP=no"
     # Use JAVA_OPTS environment variable for this purpose.
-      - "JAVA_OPTS=-Djava.util.logging.config.file=/var/jenkins_home/log.properties"
-    # You also can define jenkins arguments as JENKINS_OPTS. 
-    # This is useful to define a set of arguments to pass to jenkins launcher as you define a derived jenkins image 
-    # based on the official one with some customized settings. 
-      - "JENKINS_OPTS=--httpPort=8080"
-    # You can also change the default slave agent port for jenkins by defining JENKINS_SLAVE_AGENT_PORT.
-      - "JENKINS_SLAVE_AGENT_PORT=50000"
+    #  - "JAVA_OPTS="
     ulimits:
       memlock:
         soft: -1
@@ -26,25 +43,19 @@ services:
         soft: 262144
         hard: 262144
     volumes:
-    # Jenkins will store the workspace in /var/jenkins_home. 
+    # Jenkins will store the workspace in /bitnami/jenkins. 
     # All Jenkins data lives in there - including plugins and configuration. 
     # Backing up data:
     # If you bind mount in a volume - you can simply back up that directory (which is jenkins_home) at any time. 
     # This is highly recommended. Treat the jenkins_home directory as you would a database - 
     # in Docker you would generally put a database on a volume.
-      - './data/jenkins_home/:/var/jenkins_home/'
-    # View the generated administrator password to log in the first time.
-    #  - './data/secrets/:/var/jenkins_home/secrets/'
-    # You can specify and set the number of executors of your Jenkins master instance using a groovy script. 
-    # By default its set to 2 executors, but you can extend the image and change it to your desired number of executors.
-      - './jenkins/executors.groovy:/usr/share/jenkins/ref/init.groovy.d/executors.groovy'
-    # Jenkins logging can be configured through a properties file and java.util.logging.config.file Java property.
-      - './jenkins/log.properties:/var/jenkins_home/log.properties'
+      - 'jenkins_data:/bitnami/jenkins'
     # Access Docker socket inside the Docker Container.
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '/usr/local/bin/docker:/usr/local/bin/docker'
     ports:
       - 8080:8080
+      - 8443:8443
     # You can run builds on the master (out of the box) but if you want to attach build slave servers: 
     # make sure you map the port: -p 50000:50000 - which will be used when you connect a slave agent.
       - 50000:50000
@@ -58,6 +69,14 @@ services:
         reservations:
           cpus: '0.001'
           memory: 128M
+
+# List Jenkins Home folder in container:
+# docker exec jenkins2-master ls -l /bitnami/jenkins
+# Backup method: 
+# docker cp jenkins2-master:/bitnami/jenkins ~/jenkins_backup
+volumes:
+  jenkins_data:
+    driver: local
 
 networks:
   docker-net:
