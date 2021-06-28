@@ -14,6 +14,9 @@ services:
       - './inits/daemon.json:/etc/docker/daemon.json'
       - './inits/settings.xml:/root/.m2/settings.xml'
       - './inits/sonar-scanner.properties:/azp/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
+      # Access Docker socket inside the Docker Container.
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/usr/local/bin/docker:/usr/local/bin/docker'
     environment:
       - "AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/"
       - "AZP_POOL=pool_name"

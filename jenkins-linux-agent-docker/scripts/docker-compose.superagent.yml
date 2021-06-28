@@ -1,0 +1,55 @@
+version: '3.7'
+
+services:
+  
+  dockersuperagent1:
+    hostname: dockersuperagent1
+    #image: vagrant_dockersuperagent1
+    build: 
+      context: ./inits
+      dockerfile: Dockerfile.superagent
+    container_name: dockersuperagent1
+    restart: unless-stopped
+    environment:
+      # url for the Jenkins server, can be used as a replacement to -url option, or to set alternate jenkins URL
+      - "JENKINS_URL=http://192.168.33.10:8080"
+      # (HOST:PORT) connect to this agent host and port instead of Jenkins server, 
+      # assuming this one do route TCP traffic to Jenkins master. 
+      # Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
+      # - "JENKINS_TUNNEL="
+      # agent secret, if not set as an argument
+      - "JENKINS_SECRET="
+      # agent name, if not set as an argument
+      - "JENKINS_AGENT_NAME=dockersuperagent1"
+      # agent work directory, if not set by optional parameter -workDir
+      - "JENKINS_AGENT_WORKDIR=/home/jenkins/agent"
+      # true if the connection should be made via WebSocket rather than TCP
+      - "JENKINS_WEB_SOCKET=true"
+    volumes:
+      #- './inits/daemon.json:/etc/docker/daemon.json'
+      - './inits/settings.xml:/home/jenkins/.m2/settings.xml'
+      - './inits/sonar-scanner.properties:/home/jenkins/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
+      # Access Docker socket inside the Docker Container.
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/usr/local/bin/docker:/usr/local/bin/docker'
+    ports:
+      - 8080:8080
+      - 8443:8443
+      # You can run builds on the master (out of the box) but if you want to attach build slave servers: 
+      # make sure you map the port: -p 50000:50000 - which will be used when you connect a slave agent.
+      - 50000:50000
+    networks:
+      - docker-net
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4096M
+        reservations:
+          cpus: '0.001'
+          memory: 128M
+
+networks:
+  docker-net:
+    driver: bridge
+    

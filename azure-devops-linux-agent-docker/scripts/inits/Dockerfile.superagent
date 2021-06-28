@@ -71,21 +71,6 @@ RUN mkdir /azp/go/workspace
 RUN export GOPATH=/azp/go/workspace
 RUN rm -rf /azp/go/go1.16.5.linux-amd64.tar.gz
 
-# Docker Installation
-RUN apt-get remove -y docker docker-engine docker.io containerd runc
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-RUN apt-get update \
- && apt-get upgrade -y --no-install-recommends 
-RUN apt-get install -y docker-ce docker-ce-cli containerd.io
-#RUN usermod -aG docker ${USER}
-
-# Docker Registry Settings
-#WORKDIR /etc/docker
-#RUN systemctl stop docker
-#RUN systemctl daemon-reload
-#RUN systemctl start docker
-
 # NodeJS 14 LTS Installation
 WORKDIR /azp/nodejs
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
