@@ -1,5 +1,7 @@
 FROM jenkins:inbound-agent
-USER jenkins
+
+USER root
+
 # To make it easier for build and release pipelines to run apt-get,
 # configure apt to not require confirmation (assume the -y argument by default)
 ENV DEBIAN_FRONTEND=noninteractive
@@ -104,5 +106,6 @@ RUN rm -rf /home/jenkins/sonarscanner/sonar-scanner-cli-4.6.2.2472-linux.zip
 RUN apt-get autoremove -y & apt-get autoclean -y & apt-get clean -y
 
 # Azure DevOps Agent Starting
-# USER jenkins
+USER jenkins
+
 ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
