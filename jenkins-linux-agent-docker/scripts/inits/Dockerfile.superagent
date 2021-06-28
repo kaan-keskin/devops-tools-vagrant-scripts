@@ -1,4 +1,4 @@
-FROM jenkins:inbound-agent
+FROM jenkins/inbound-agent:4.7-1-jdk11
 
 USER root
 
@@ -20,9 +20,6 @@ RUN apt-get update \
         gnupg-agent \
         jq \
         iputils-ping \
-        libcurl4 \
-        libicu60 \
-        libunwind8 \
         netcat \
         wget \
         unzip \
@@ -77,7 +74,7 @@ RUN rm -rf /home/jenkins/gogo1.16.5.linux-amd64.tar.gz
 # NodeJS 14 LTS Installation
 RUN mkdir -p /home/jenkins/nodejs
 WORKDIR /home/jenkins/nodejs
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y --no-install-recommends nodejs
 
 # Java Home Folder Set
@@ -103,9 +100,9 @@ RUN export PATH=${PATH}:/home/jenkins/sonarscanner/sonar-scanner-4.6.2.2472-linu
 RUN rm -rf /home/jenkins/sonarscanner/sonar-scanner-cli-4.6.2.2472-linux.zip
 
 # Cleanup Debian Environment
-RUN apt-get autoremove -y & apt-get autoclean -y & apt-get clean -y
+RUN apt-get autoremove & apt-get autoclean & apt-get clean
 
-# Azure DevOps Agent Starting
+# Jenkins Agent Starting
 USER jenkins
 
 ENTRYPOINT ["/usr/local/bin/jenkins-agent"]

@@ -4,7 +4,7 @@ services:
   
   dockertestagent1:
     hostname: dockertestagent1
-    image: jenkins/inbound-agent
+    image: jenkins/inbound-agent:4.7-1-jdk11
     container_name: dockertestagent1
     restart: unless-stopped
     environment:
@@ -15,7 +15,7 @@ services:
       # Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
       # - "JENKINS_TUNNEL="
       # agent secret, if not set as an argument
-      - "JENKINS_SECRET="
+      - "JENKINS_SECRET=b6cb9742fc2ec77eabba517d029674d08d73859bb5e64f188e0ef533243dd8de"
       # agent name, if not set as an argument
       - "JENKINS_AGENT_NAME=dockertestagent1"
       # agent work directory, if not set by optional parameter -workDir

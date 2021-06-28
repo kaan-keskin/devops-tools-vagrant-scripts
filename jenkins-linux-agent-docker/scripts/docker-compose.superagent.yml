@@ -18,7 +18,7 @@ services:
       # Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
       # - "JENKINS_TUNNEL="
       # agent secret, if not set as an argument
-      - "JENKINS_SECRET="
+      - "JENKINS_SECRET=07fc9c7a5ff929a52c5990184b66309faa186808d0df8102cd40721c9c8847dc"
       # agent name, if not set as an argument
       - "JENKINS_AGENT_NAME=dockersuperagent1"
       # agent work directory, if not set by optional parameter -workDir
