@@ -79,7 +79,3 @@ trap 'cleanup; exit 143' TERM
 # To be aware of TERM and INT signals call run.sh
 # Running it with the --once flag at the end will shut down the agent after the build is executed
 ./run.sh "$@"
-
-# `exec` the node runtime so it's aware of TERM and INT signals
-# AgentService.js understands how to handle agent self-update and restart
-#exec ./externals/node/bin/node ./bin/AgentService.js interactive

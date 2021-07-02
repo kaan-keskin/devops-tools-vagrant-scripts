@@ -23,17 +23,9 @@ RUN apt-get update \
         netcat \
         wget \
         unzip \
-        tree
-
-# Debian Buster Repository Default Vim, Git, Java, Maven, and NodeJS Installations
-RUN apt-get install -y --no-install-recommends \
+        tree \
         vim \
-        git \
-        default-jdk \
-        openjdk-11-jdk \
-        maven \
-        nodejs \
-        npm
+        git
 
 # GCC and CPP Installations
 RUN apt-get install -y --no-install-recommends \
@@ -62,7 +54,6 @@ RUN apt-get install -y --no-install-recommends \
 RUN pip3 install flask 
 
 # Go 1.16.5 Installation
-RUN mkdir -p /home/jenkins/go
 WORKDIR /home/jenkins/go
 RUN wget https://dl.google.com/go/go1.16.5.linux-amd64.tar.gz
 RUN tar -zxvf go1.16.5.linux-amd64.tar.gz -C /usr/local/
@@ -72,17 +63,19 @@ RUN export GOPATH=/home/jenkins/go/workspace
 RUN rm -rf /home/jenkins/gogo1.16.5.linux-amd64.tar.gz
 
 # NodeJS 14 LTS Installation
-RUN mkdir -p /home/jenkins/nodejs
 WORKDIR /home/jenkins/nodejs
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get update
 RUN apt-get install -y --no-install-recommends nodejs
 
-# Java Home Folder Set
-RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+# Java JDK 11 Installation and JAVA_HOME Environment Variable Set
+RUN apt-get install -y --no-install-recommends openjdk-11-jdk 
+RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 RUN export PATH=$PATH:$JAVA_HOME/bin
 
 # Maven 3.8.1 Installation
-RUN mkdir -p /home/jenkins/maven
+RUN apt-get install -y --no-install-recommends maven
 WORKDIR /home/jenkins/maven
 RUN wget https://ftp.itu.edu.tr/Mirror/Apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
 RUN tar -xvzf apache-maven-3.8.1-bin.tar.gz \
@@ -92,7 +85,6 @@ RUN tar -xvzf apache-maven-3.8.1-bin.tar.gz \
 RUN rm -rf /home/jenkins/maven/apache-maven-3.8.1-bin.tar.gz
 
 # SonarScanner 4.6.2.2472 Installation
-RUN mkdir -p /home/jenkins/sonarscanner
 WORKDIR /home/jenkins/sonarscanner
 RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
 RUN unzip sonar-scanner-cli-4.6.2.2472-linux.zip
@@ -100,7 +92,8 @@ RUN export PATH=${PATH}:/home/jenkins/sonarscanner/sonar-scanner-4.6.2.2472-linu
 RUN rm -rf /home/jenkins/sonarscanner/sonar-scanner-cli-4.6.2.2472-linux.zip
 
 # Cleanup Debian Environment
-RUN apt-get autoremove & apt-get autoclean & apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y
 
 # Jenkins Agent Starting
 USER jenkins
