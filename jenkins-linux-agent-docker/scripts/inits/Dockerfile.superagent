@@ -60,7 +60,7 @@ RUN tar -zxvf go1.16.5.linux-amd64.tar.gz -C /usr/local/
 RUN export PATH=${PATH}:/usr/local/go/bin
 RUN mkdir -p /home/jenkins/go/workspace
 RUN export GOPATH=/home/jenkins/go/workspace
-RUN rm -rf /home/jenkins/gogo1.16.5.linux-amd64.tar.gz
+RUN rm -rf /home/jenkins/go/go1.16.5.linux-amd64.tar.gz
 
 # NodeJS 14 LTS Installation
 WORKDIR /home/jenkins/nodejs
@@ -71,7 +71,7 @@ RUN apt-get install -y --no-install-recommends nodejs
 # Java JDK 11 Installation and JAVA_HOME Environment Variable Set
 RUN apt-get install -y --no-install-recommends openjdk-11-jdk 
 RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
-#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 RUN export PATH=$PATH:$JAVA_HOME/bin
 
 # Maven 3.8.1 Installation

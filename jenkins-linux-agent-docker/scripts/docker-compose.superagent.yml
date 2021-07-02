@@ -25,11 +25,15 @@ services:
       - "JENKINS_AGENT_WORKDIR=/home/jenkins/agent"
       # true if the connection should be made via WebSocket rather than TCP
       - "JENKINS_WEB_SOCKET=true"
+      # Software Tools Env Definitions:
+      - "JAVA_HOME=/usr/lib/jvm/java-11-openjdk/"
+      - "GOPATH=/home/jenkins/go/workspace"
+      - "M2_HOME=/usr/share/maven"
     volumes:
-      #- './inits/daemon.json:/etc/docker/daemon.json'
       - './inits/settings.xml:/home/jenkins/.m2/settings.xml'
       - './inits/sonar-scanner.properties:/home/jenkins/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
       # Access Docker socket inside the Docker Container.
+      #- './inits/daemon.json:/etc/docker/daemon.json'
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '/usr/local/bin/docker:/usr/local/bin/docker'
     ports:
