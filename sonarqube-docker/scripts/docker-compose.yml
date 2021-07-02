@@ -17,8 +17,8 @@ services:
     networks:
       - docker-net
     volumes:
-      - './data/postgresql/:/var/lib/postgresql/'
-      - './data/postgresql_data/:/var/lib/postgresql/data/'
+      - 'postgresql:/var/lib/postgresql/'
+      - 'postgresql_data:/var/lib/postgresql/data/'
     command:
       - "postgres"
       - "-c"
@@ -56,8 +56,8 @@ services:
         soft: 262144
         hard: 262144
     volumes:
-      - './data/sonarqube_data/:/opt/sonarqube/data/'
-      - './data/sonarqube_logs/:/opt/sonarqube/logs/'
+      - 'sonarqube_data:/opt/sonarqube/data/'
+      - 'sonarqube_logs:/opt/sonarqube/logs/'
       - './plugins/:/opt/sonarqube/extensions/plugins/'
       #- './data/sonarqube_extensions/:/opt/sonarqube/extensions/'
     ports:
@@ -72,6 +72,16 @@ services:
         reservations:
           cpus: '0.001'
           memory: 128M
+
+volumes:
+  postgresql:
+    driver: local
+  postgresql_data:
+    driver: local
+  sonarqube_data:
+    driver: local
+  sonarqube_logs:
+    driver: local
 
 networks:
   docker-net:

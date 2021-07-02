@@ -22,7 +22,7 @@ services:
         hard: 262144
     volumes:
     # Before using volume mapping, make sure that ./data/nexus-data/ folder owned by PID 200
-    # To do that: sudo chown -R 200 ./data/nexus-data 
+    # To do that: sudo chown -R 200:200 ./data/nexus-data 
       - './data/nexus-data/:/nexus-data/'
     ports:
       - 8081:8081
