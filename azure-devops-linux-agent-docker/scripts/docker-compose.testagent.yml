@@ -11,8 +11,11 @@ services:
     container_name: dockertestagent1
     restart: unless-stopped
     environment:
+      # Azure DevOps Agent Env Definitions:
       - "AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/"
-      - "AZP_POOL=pool_name"
+      - "AZP_POOL=Default"
       - "AZP_USERNAME=username"
       - "AZP_PASSWORD=password"
+      - "AZP_TOKEN=token"
+      - "AZP_WORK=_work"
   

@@ -54,7 +54,7 @@ RUN apt-get install -y nodejs
 # Java JDK 11 Installation and JAVA_HOME Environment Variable Set
 RUN apt-get install -y --no-install-recommends openjdk-11-jdk 
 RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
-#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 RUN export PATH=$PATH:$JAVA_HOME/bin
 
 # Maven 3.8.1 Installation
@@ -65,6 +65,7 @@ RUN tar -xvzf apache-maven-3.8.1-bin.tar.gz \
   && mv apache-maven-3.8.1 maven \
   && mv /usr/share/maven /usr/share/maven-old \ 
   && mv maven /usr/share/
+RUN export M2_HOME=/usr/share/maven
 RUN rm -rf /azp/maven/apache-maven-3.8.1-bin.tar.gz
 
 # SonarScanner 4.6.2.2472 Installation
@@ -92,12 +93,12 @@ RUN curl -LsS https://aka.ms/InstallAzureCLIDeb | bash \
 
 # Azure DevOps Agent Environment Variables
 ENV AGENT_ALLOW_RUNASROOT=1
-ENV AZP_AGENT_NAME=azure_devops_agent
 ENV AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/
-ENV AZP_POOL=pool_name
-ENV AZP_TOKEN=token
+ENV AZP_POOL=Default
 ENV AZP_USERNAME=username
 ENV AZP_PASSWORD=password
+ENV AZP_TOKEN=token
+ENV AZP_WORK=_work
 
 # Azure DevOps Agent Installation
 ARG TARGETARCH=amd64
@@ -116,8 +117,8 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y
 
 # Azure DevOps Agent Starting
-WORKDIR /azp
+WORKDIR /azp/agent
 COPY ./start.sh .
 RUN chmod +x start.sh
 
-ENTRYPOINT [ "./start.sh" ]
+ENTRYPOINT [ "/azp/agent/start.sh" ]

@@ -26,12 +26,12 @@ RUN curl -LsS https://aka.ms/InstallAzureCLIDeb | bash \
 
 # Azure DevOps Agent Environment Variables
 ENV AGENT_ALLOW_RUNASROOT=1
-ENV AZP_AGENT_NAME=azure_devops_agent
 ENV AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/
-ENV AZP_POOL=pool_name
-ENV AZP_TOKEN=token
+ENV AZP_POOL=Default
 ENV AZP_USERNAME=username
 ENV AZP_PASSWORD=password
+ENV AZP_TOKEN=token
+ENV AZP_WORK=_work
 
 # Azure DevOps Agent Installation
 ARG TARGETARCH=amd64
@@ -45,9 +45,13 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     curl -LsS "$AZP_AGENTPACKAGE_URL" | tar -xz
 RUN ./bin/installdependencies.sh
 
+# Cleanup Ubuntu Environment
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y
+
 # Azure DevOps Agent Starting
-WORKDIR /azp
+WORKDIR /azp/agent
 COPY ./start.sh .
 RUN chmod +x start.sh
 
-ENTRYPOINT [ "./start.sh" ]
+ENTRYPOINT [ "/azp/agent/start.sh" ]

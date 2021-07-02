@@ -22,10 +22,6 @@ if [ -n "$AZP_WORK" ]; then
   mkdir -p "$AZP_WORK"
 fi
 
-# rm -rf /azp/agent
-# mkdir /azp/agent
-cd /azp/agent
-
 export AGENT_ALLOW_RUNASROOT="1"
 
 cleanup() {
@@ -35,7 +31,13 @@ cleanup() {
     # If the agent has some running jobs, the configuration removal process will fail.
     # So, give it some time to finish the job.
     while true; do
-      ./config.sh remove --unattended --auth PAT --token $(cat "$AZP_TOKEN_FILE") && break
+      #./config.sh remove --unattended --auth PAT --token $(cat "$AZP_TOKEN_FILE") && break
+      ./config.sh remove --unattended \
+          --sslskipcertvalidation \
+          --auth negotiate \
+          --username "$AZP_USERNAME" \
+          --password "$AZP_PASSWORD" \
+          && break
 
       echo "Retrying in 30 seconds..."
       sleep 30

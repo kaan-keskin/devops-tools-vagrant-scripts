@@ -11,16 +11,22 @@ services:
     container_name: dockersuperagent1
     restart: unless-stopped
     volumes:
-      - './inits/daemon.json:/etc/docker/daemon.json'
       - './inits/settings.xml:/root/.m2/settings.xml'
       - './inits/sonar-scanner.properties:/azp/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
       # Access Docker socket inside the Docker Container.
+      - './inits/daemon.json:/etc/docker/daemon.json'
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '/usr/local/bin/docker:/usr/local/bin/docker'
     environment:
-      - "JAVA_HOME=/usr/lib/jvm/jre-11-openjdk/"
+      # Software Tools Env Definitions:
+      - "JAVA_HOME=/usr/lib/jvm/java-11-openjdk/"
+      - "GOPATH=/azp/go/workspace"
+      - "M2_HOME=/usr/share/maven"
+      # Azure DevOps Agent Env Definitions:
       - "AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/"
-      - "AZP_POOL=pool_name"
+      - "AZP_POOL=Default"
       - "AZP_USERNAME=username"
       - "AZP_PASSWORD=password"
+      - "AZP_TOKEN=token"
+      - "AZP_WORK=_work"
   
