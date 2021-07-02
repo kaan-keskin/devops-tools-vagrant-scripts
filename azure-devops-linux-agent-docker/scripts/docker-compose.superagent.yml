@@ -18,6 +18,7 @@ services:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '/usr/local/bin/docker:/usr/local/bin/docker'
     environment:
+      - "JAVA_HOME=/usr/lib/jvm/jre-11-openjdk/"
       - "AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/"
       - "AZP_POOL=pool_name"
       - "AZP_USERNAME=username"

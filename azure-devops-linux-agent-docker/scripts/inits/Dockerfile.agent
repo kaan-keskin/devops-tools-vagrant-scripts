@@ -13,28 +13,12 @@ RUN apt-get update \
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
         apt-transport-https \
-        ca-certificates \
-        curl \
         gnupg-agent \
-        jq \
-        iputils-ping \
-        libcurl4 \
-        libicu60 \
-        libunwind8 \
-        netcat \
         wget \
         unzip \
-        tree
-
-# Ubuntu 18.04 Repository Default Vim, Git, Java, Maven, and NodeJS Installations
-RUN apt-get install -y --no-install-recommends \
+        tree \
         vim \
-        git \
-        default-jdk \
-        openjdk-11-jdk \
-        maven \
-        nodejs \
-        npm
+        git
 
 # GCC and CPP Installations
 RUN apt-get install -y --no-install-recommends \
@@ -42,7 +26,7 @@ RUN apt-get install -y --no-install-recommends \
         software-properties-common \
         libc6-dev \
         gcc \
-        g++\
+        g++ \
         cpp \
         dpkg-dev \
         make \
@@ -61,14 +45,18 @@ RUN apt-get install -y --no-install-recommends \
 
 # NodeJS 14 LTS Installation
 WORKDIR /azp/nodejs
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-RUN apt-get install -y --no-install-recommends nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get update
+RUN apt-get install -y nodejs
 
-# Java Home Folder Set
-RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+# Java JDK 11 Installation and JAVA_HOME Environment Variable Set
+RUN apt-get install -y --no-install-recommends openjdk-11-jdk 
+RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 RUN export PATH=$PATH:$JAVA_HOME/bin
 
 # Maven 3.8.1 Installation
+RUN apt-get install -y --no-install-recommends maven
 WORKDIR /azp/maven
 RUN wget https://ftp.itu.edu.tr/Mirror/Apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
 RUN tar -xvzf apache-maven-3.8.1-bin.tar.gz \
@@ -84,30 +72,49 @@ RUN unzip sonar-scanner-cli-4.6.2.2472-linux.zip
 RUN export PATH=${PATH}:/azp/sonarscanner/sonar-scanner-4.6.2.2472-linux/bin
 RUN rm -rf /azp/sonarscanner/sonar-scanner-cli-4.6.2.2472-linux.zip
 
-# Azure DevOps Agent 2.153.1 Installation
-ARG VSTS_VERSION=2.153.1
-WORKDIR /azp/agent
-RUN wget https://vstsagentpackage.azureedge.net/agent/2.153.1/vsts-agent-linux-x64-2.153.1.tar.gz
+# Install Azure DevOps Required Dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    jq \
+    iputils-ping \
+    libcurl4 \
+    libicu60 \
+    libunwind8 \
+    netcat \
+    libssl1.0 \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN curl -LsS https://aka.ms/InstallAzureCLIDeb | bash \
+  && rm -rf /var/lib/apt/lists/*
 
 # Azure DevOps Agent Environment Variables
 ENV AGENT_ALLOW_RUNASROOT=1
-#ENV AZP_AGENT_NAME=
+ENV AZP_AGENT_NAME=azure_devops_agent
 ENV AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/
 ENV AZP_POOL=pool_name
 ENV AZP_TOKEN=token
 ENV AZP_USERNAME=username
 ENV AZP_PASSWORD=password
 
-# Azure DevOps Agent Dependencies
-RUN tar xzf vsts-agent-linux-x64-2.153.1.tar.gz \
-  && ./bin/installdependencies.sh
-RUN rm -rf /azp/agent/vsts-agent-linux-x64-2.153.1.tar.gz
+# Azure DevOps Agent Installation
+ARG TARGETARCH=amd64
+ARG AGENT_VERSION=2.153.1
+WORKDIR /azp/agent
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+      AZP_AGENTPACKAGE_URL=https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-x64-${AGENT_VERSION}.tar.gz; \
+    else \
+      AZP_AGENTPACKAGE_URL=https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-${TARGETARCH}-${AGENT_VERSION}.tar.gz; \
+    fi; \
+    curl -LsS "$AZP_AGENTPACKAGE_URL" | tar -xz
+RUN ./bin/installdependencies.sh
 
 # Cleanup Ubuntu Environment
-RUN apt-get autoremove -y & apt-get autoclean -y & apt-get clean -y
+RUN apt-get autoremove & apt-get autoclean & apt-get clean
 
 # Azure DevOps Agent Starting
 WORKDIR /azp
 COPY ./start.sh .
 RUN chmod +x start.sh
-CMD ["./start.sh"]
+
+ENTRYPOINT [ "./start.sh" ]

@@ -12,7 +12,7 @@ if [ -z "$AZP_TOKEN_FILE" ]; then
     exit 1
   fi
 
-  AZP_TOKEN_FILE=/azp/.token
+  AZP_TOKEN_FILE=/azp/agent/.token
   echo -n $AZP_TOKEN > "$AZP_TOKEN_FILE"
 fi
 
@@ -32,9 +32,14 @@ cleanup() {
   if [ -e config.sh ]; then
     print_header "Cleanup. Removing Azure Pipelines agent..."
 
-    ./config.sh remove --unattended \
-      --auth PAT \
-      --token $(cat "$AZP_TOKEN_FILE")
+    # If the agent has some running jobs, the configuration removal process will fail.
+    # So, give it some time to finish the job.
+    while true; do
+      ./config.sh remove --unattended --auth PAT --token $(cat "$AZP_TOKEN_FILE") && break
+
+      echo "Retrying in 30 seconds..."
+      sleep 30
+    done
   fi
 }
 
@@ -47,33 +52,9 @@ print_header() {
 # Let the agent ignore the token env variables
 export VSO_AGENT_IGNORE=AZP_TOKEN,AZP_TOKEN_FILE
 
-#print_header "1. Determining matching Azure Pipelines agent..."
-
-#AZP_AGENT_RESPONSE=$(curl -LsS \
-#  -u user:$(cat "$AZP_TOKEN_FILE") \
-#  -H 'Accept:application/json;api-version=3.0-preview' \
-#  "$AZP_URL/_apis/distributedtask/packages/agent?platform=linux-x64")
-
-#if echo "$AZP_AGENT_RESPONSE" | jq . >/dev/null 2>&1; then
-#  AZP_AGENTPACKAGE_URL=$(echo "$AZP_AGENT_RESPONSE" \
-#    | jq -r '.value | map([.version.major,.version.minor,.version.patch,.downloadUrl]) | sort | .[length-1] | .[3]')
-#fi
-
-#if [ -z "$AZP_AGENTPACKAGE_URL" -o "$AZP_AGENTPACKAGE_URL" == "null" ]; then
-#  echo 1>&2 "error: could not determine a matching Azure Pipelines agent - check that account '$AZP_URL' is correct and the token is valid for that account"
-#  exit 1
-#fi
-
-#print_header "2. Downloading and installing Azure Pipelines agent..."
-
-#curl -LsS $AZP_AGENTPACKAGE_URL | tar -xz & wait $!
-
 source ./env.sh
 
-trap 'cleanup; exit 130' INT
-trap 'cleanup; exit 143' TERM
-
-print_header "3. Configuring Azure Pipelines agent..."
+print_header "1. Configuring Azure Pipelines agent..."
 
 ./config.sh --unattended \
   --sslskipcertvalidation \
@@ -86,14 +67,19 @@ print_header "3. Configuring Azure Pipelines agent..."
   --work "${AZP_WORK:-_work}" \
   --replace \
   --acceptTeeEula & wait $!
-#  --auth PAT \
-#  --token $(cat "$AZP_TOKEN_FILE") \
+  #--auth PAT \
+  #--token $(cat "$AZP_TOKEN_FILE") \
 
-# remove the administrative token before accepting work
-rm $AZP_TOKEN_FILE
+print_header "2. Running Azure Pipelines agent..."
 
-print_header "4. Running Azure Pipelines agent..."
+trap 'cleanup; exit 0' EXIT
+trap 'cleanup; exit 130' INT
+trap 'cleanup; exit 143' TERM
+
+# To be aware of TERM and INT signals call run.sh
+# Running it with the --once flag at the end will shut down the agent after the build is executed
+./run.sh "$@"
 
 # `exec` the node runtime so it's aware of TERM and INT signals
 # AgentService.js understands how to handle agent self-update and restart
-exec ./externals/node/bin/node ./bin/AgentService.js interactive
+#exec ./externals/node/bin/node ./bin/AgentService.js interactive

@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  
+  dockertestagent1:
+    hostname: dockertestagent1
+    #image: dockertestagent1
+    build: 
+      context: ./inits
+      dockerfile: Dockerfile.testagent
+    container_name: dockertestagent1
+    restart: unless-stopped
+    environment:
+      - "AZP_URL=http://domain.company.com.tr:8080/tfs/collection_name/"
+      - "AZP_POOL=pool_name"
+      - "AZP_USERNAME=username"
+      - "AZP_PASSWORD=password"
+  
