@@ -1,6 +1,5 @@
 # Configurable environment variables:
 # HOST_IP - the docker host IP address
-# DOCKER_ORIGIN - denotes the docker origin (dockerhub ID)
 # VERSION - the version identifier tag on the packages
 # DB_VERSION - the version identifier tag on the postgres/elasticsearch images (from a different origin)
 # AUTOMATE_ENABLED - enable the Automate data collector (true or false)
@@ -24,7 +23,7 @@ services:
       - postgresql-data:/hab/svc/postgresql/data
 
   chef-server-ctl:
-    image: ${DOCKER_ORIGIN:-chef}/chef-server-ctl:${VERSION:-stable}
+    image: chef/chef-server-ctl:${VERSION:-stable}
     command: --peer postgresql
     environment:
       HAB_CHEF_SERVER_CTL: |
@@ -44,25 +43,25 @@ services:
       - elasticsearch-data:/hab/svc/elasticsearch/data
 
   oc_id:
-    image: ${DOCKER_ORIGIN:-chef}/oc_id:${VERSION:-stable}
+    image: chef/oc_id:${VERSION:-stable}
     command: --peer postgresql
       --bind database:postgresql.default
       --bind chef-server-ctl:chef-server-ctl.default
 
   bookshelf:
-    image: ${DOCKER_ORIGIN:-chef}/bookshelf:${VERSION:-stable}
+    image: chef/bookshelf:${VERSION:-stable}
     command: --peer postgresql
       --bind database:postgresql.default
       --bind chef-server-ctl:chef-server-ctl.default
 
   oc_bifrost:
-    image: ${DOCKER_ORIGIN:-chef}/oc_bifrost:${VERSION:-stable}
+    image: chef/oc_bifrost:${VERSION:-stable}
     command: --peer postgresql
       --bind database:postgresql.default
       --bind chef-server-ctl:chef-server-ctl.default
 
   oc_erchef:
-    image: ${DOCKER_ORIGIN:-chef}/oc_erchef:${VERSION:-stable}
+    image: chef/oc_erchef:${VERSION:-stable}
     command: --peer postgresql
       --bind bookshelf:bookshelf.default
       --bind oc_bifrost:oc_bifrost.default
@@ -82,7 +81,7 @@ services:
         port = 443
 
   chef-server-nginx:
-    image: ${DOCKER_ORIGIN:-chef}/chef-server-nginx:${VERSION:-stable}
+    image: chef/chef-server-nginx:${VERSION:-stable}
     tty: true
     stdin_open: true
     command: --peer postgresql

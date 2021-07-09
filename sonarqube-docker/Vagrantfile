@@ -12,10 +12,10 @@
     end
     dev1.vm.network "private_network", ip: "192.168.33.10"
     dev1.vm.synced_folder "./scripts", "/vagrant"
-    dev1.vm.provision "shell", inline: <<-SHELL
-      mkdir -p /etc/docker
-      cp -f /vagrant/docker/daemon.json /etc/docker/daemon.json
-    SHELL
+    #dev1.vm.provision "shell", inline: <<-SHELL
+    #  mkdir -p /etc/docker
+    #  cp -f /vagrant/docker/daemon.json /etc/docker/daemon.json
+    #SHELL
     dev1.vm.provision :docker
     dev1.vm.provision :docker_compose
 
