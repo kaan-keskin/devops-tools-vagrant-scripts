@@ -4,19 +4,17 @@ services:
   
   dockersuperagent1:
     hostname: dockersuperagent1
-    #image: vagrant_dockersuperagent1
     build: 
       context: ./inits
       dockerfile: Dockerfile.superagent
+    image: azure-devops-linux-superagent:latest
     container_name: dockersuperagent1
     restart: unless-stopped
     volumes:
       - './inits/settings.xml:/root/.m2/settings.xml'
       - './inits/sonar-scanner.properties:/azp/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
-      # Access Docker socket inside the Docker Container.
+      # Inject Docker Configuration:
       - './inits/daemon.json:/etc/docker/daemon.json'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-      - '/usr/local/bin/docker:/usr/local/bin/docker'
     environment:
       # Software Tools Env Definitions:
       - "JAVA_HOME=/usr/lib/jvm/java-11-openjdk/"

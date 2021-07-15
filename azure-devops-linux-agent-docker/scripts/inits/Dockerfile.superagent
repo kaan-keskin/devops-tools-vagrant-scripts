@@ -15,7 +15,11 @@ RUN apt-get update \
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
         apt-transport-https \
+        gnupg \
         gnupg-agent \
+        ca-certificates \
+        curl \
+        lsb-release \
         wget \
         unzip \
         tree \
@@ -86,6 +90,18 @@ RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-s
 RUN unzip sonar-scanner-cli-4.6.2.2472-linux.zip
 RUN export PATH=${PATH}:/azp/sonarscanner/sonar-scanner-4.6.2.2472-linux/bin
 RUN rm -rf /azp/sonarscanner/sonar-scanner-cli-4.6.2.2472-linux.zip
+
+# Install Docker Engine on Ubuntu
+# Older versions of Docker were called docker, docker.io, or docker-engine. If these are installed, uninstall them:
+RUN apt-get remove -y docker docker-engine docker.io containerd runc
+# Add Docker’s official GPG key:
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# Use the following command to set up the stable repository.
+RUN echo \
+    "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+# Update the apt package index, and install the latest version of Docker Engine and containerd, or go to the next step to install a specific version:
+RUN apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
 
 # Install Azure DevOps Required Dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -4,10 +4,10 @@ services:
   
   dockertestagent1:
     hostname: dockertestagent1
-    #image: dockertestagent1
     build: 
       context: ./inits
       dockerfile: Dockerfile.testagent
+    image: azure-devops-linux-testagent:latest
     container_name: dockertestagent1
     restart: unless-stopped
     environment:

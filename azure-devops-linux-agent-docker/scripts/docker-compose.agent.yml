@@ -4,17 +4,16 @@ services:
   
   dockeragent1:
     hostname: dockeragent1
-    #image: vagrant_dockeragent1
     build: 
       context: ./inits
       dockerfile: Dockerfile.agent
+    image: azure-devops-linux-agent:latest
     container_name: dockeragent1
     restart: unless-stopped
     volumes:
       - './inits/settings.xml:/root/.m2/settings.xml'
       - './inits/sonar-scanner.properties:/azp/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
       # Access Docker socket inside the Docker Container.
-      - './inits/daemon.json:/etc/docker/daemon.json'
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '/usr/local/bin/docker:/usr/local/bin/docker'
     environment:

@@ -15,7 +15,11 @@ RUN apt-get update \
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
         apt-transport-https \
+        gnupg \
         gnupg-agent \
+        ca-certificates \
+        curl \
+        lsb-release \
         wget \
         unzip \
         tree \
@@ -44,6 +48,18 @@ RUN apt-get install -y --no-install-recommends \
         virtualenv \
         libssl-dev \
         libffi-dev 
+
+# Python3 Flask Installation
+RUN pip3 install flask 
+
+# Go 1.16.5 Installation
+WORKDIR /azp/go
+RUN wget https://dl.google.com/go/go1.16.5.linux-amd64.tar.gz
+RUN tar -zxvf go1.16.5.linux-amd64.tar.gz -C /usr/local/
+RUN export PATH=${PATH}:/usr/local/go/bin
+RUN mkdir /azp/go/workspace
+RUN export GOPATH=/azp/go/workspace
+RUN rm -rf /azp/go/go1.16.5.linux-amd64.tar.gz
 
 # NodeJS 14 LTS Installation
 WORKDIR /azp/nodejs
