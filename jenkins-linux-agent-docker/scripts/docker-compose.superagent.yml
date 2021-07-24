@@ -18,7 +18,7 @@ services:
       # Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
       # - "JENKINS_TUNNEL="
       # agent secret, if not set as an argument
-      - "JENKINS_SECRET=07fc9c7a5ff929a52c5990184b66309faa186808d0df8102cd40721c9c8847dc"
+      - "JENKINS_SECRET=06af086a70f7cc12ac56a3c4cbe36971e254adbaaab50c0e41d4ad4ab6e68248"
       # agent name, if not set as an argument
       - "JENKINS_AGENT_NAME=dockersuperagent1"
       # agent work directory, if not set by optional parameter -workDir
@@ -26,12 +26,14 @@ services:
       # true if the connection should be made via WebSocket rather than TCP
       - "JENKINS_WEB_SOCKET=true"
       # Software Tools Env Definitions:
-      - "JAVA_HOME=/usr/lib/jvm/java-11-openjdk/"
+      - "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/"
       - "GOPATH=/home/jenkins/go/workspace"
-      - "M2_HOME=/usr/share/maven"
+      - "MAVEN_HOME=/usr/share/maven"
+      - "ANSIBLE_EXECUTABLE=/usr/bin/ansible"
     volumes:
-      - './inits/settings.xml:/home/jenkins/.m2/settings.xml'
-      - './inits/sonar-scanner.properties:/home/jenkins/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
+      #- './inits/settings.xml:/home/jenkins/.m2/settings.xml'
+      #- './inits/sonar-scanner.properties:/home/jenkins/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
+      #- './inits/ansible-hosts:/etc/ansible/hosts'
       # Access Docker socket inside the Docker Container.
       #- './inits/daemon.json:/etc/docker/daemon.json'
       - '/var/run/docker.sock:/var/run/docker.sock'

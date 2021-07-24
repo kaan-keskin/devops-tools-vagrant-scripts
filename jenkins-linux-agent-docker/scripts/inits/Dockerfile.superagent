@@ -71,7 +71,7 @@ RUN apt-get install -y --no-install-recommends nodejs
 # Java JDK 11 Installation and JAVA_HOME Environment Variable Set
 RUN apt-get install -y --no-install-recommends openjdk-11-jdk 
 RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
-#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+#RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 RUN export PATH=$PATH:$JAVA_HOME/bin
 
 # Maven 3.8.1 Installation
@@ -90,6 +90,9 @@ RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-s
 RUN unzip sonar-scanner-cli-4.6.2.2472-linux.zip
 RUN export PATH=${PATH}:/home/jenkins/sonarscanner/sonar-scanner-4.6.2.2472-linux/bin
 RUN rm -rf /home/jenkins/sonarscanner/sonar-scanner-cli-4.6.2.2472-linux.zip
+
+# Ansible Installation
+RUN apt install ansible
 
 # Cleanup Debian Environment
 RUN rm -rf /var/lib/apt/lists/*

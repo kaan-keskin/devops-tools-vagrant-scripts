@@ -1,0 +1,86 @@
+version: '3.7'
+
+services:
+
+#-------------------Tomcat-10-Service-------------------
+  tomcat10:
+    image: 'bitnami/tomcat:10.0.8'
+    hostname: tomcat10
+    container_name: tomcat10
+    restart: unless-stopped
+    # For customizations, please note that this image is, by default, a non-root container using the user uid=1001.
+    # user: 1001
+    environment:
+    # Tomcat shutdown port. Default: 8005
+      - "TOMCAT_SHUTDOWN_PORT_NUMBER=8005"
+    # Tomcat HTTP port. Default: 8080
+      - "TOMCAT_HTTP_PORT_NUMBER=8080"
+    # Tomcat AJP port. Default: 8009
+      - "TOMCAT_AJP_PORT_NUMBER=8009"
+    # Tomcat user's home directory, this will set user.home. Default: /opt/bitnami/tomcat
+      - "TOMCAT_HOME=/opt/bitnami/tomcat"
+    # Tomcat user. Default: user
+      - "TOMCAT_USERNAME=user"
+    # Tomcat password.
+      - "TOMCAT_PASSWORD=password"
+    # Allow to connect to manager applications from remote addresses. Valid values are 0 and 1. Default: 0
+      - "TOMCAT_ALLOW_REMOTE_MANAGEMENT=1"
+    # Java home directory.
+      - "JAVA_HOME=/opt/bitnami/java"
+    # Tomcat java settings. Default: -Djava.awt.headless=true -XX:+UseG1GC -Dfile.encoding=UTF-8 -Duser.home=$TOMCAT_HOME
+      - "JAVA_OPTS=-Djava.awt.headless=true -XX:+UseG1GC -Dfile.encoding=UTF-8 -Duser.home=$TOMCAT_HOME"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+    # 
+    # As this is a non-root container, the mounted files and directories must have the proper permissions for the UID 1001.
+    # 
+    # If you remove the container all your data and configurations will be lost, 
+    # and the next time you run the image the database will be reinitialized. 
+    # To avoid this loss of data, you should mount a volume that will persist even after the container is removed.
+    # 
+    # For persistence you should mount a directory at the /bitnami path. 
+    # If the mounted directory is empty, it will be initialized on the first run.
+      - 'tomcat_data:/bitnami/'
+    # 
+    # In case you want to create a custom image that already contains your application war file, 
+    # you need to add it to the /opt/bitnami/tomcat/webapps_default folder.
+    # - './webapps/webapp.war:/opt/bitnami/tomcat/webapps_default/webapp.war'
+    # 
+    # During the initialization of the container, 
+    # the default Tomcat configuration files are modified with the basic options defined through environment variables. 
+    # If you want to add more specific configuration options, 
+    # you can always mount your own configuration files under /opt/bitnami/tomcat/conf/ to override the existing ones. 
+    # Please note that those files should be writable by the system user of the container.
+    # - './conf/server.xml:/opt/bitnami/tomcat/conf/server.xml'
+    # 
+    ports:
+      - 8080:8080
+      - 8443:8443
+    networks:
+      - docker-net
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4096M
+        reservations:
+          cpus: '0.001'
+          memory: 128M
+
+# List Tomcat Home folder from outside of the container:
+# docker exec tomcat10 ls -l /bitnami/
+# Backup method: 
+# docker cp tomcat10:/bitnami/ ~/tomcat10_backup
+volumes:
+  tomcat_data:
+    driver: local
+
+networks:
+  docker-net:
+    driver: bridge
