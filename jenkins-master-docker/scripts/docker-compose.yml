@@ -35,6 +35,8 @@ services:
       - "JENKINS_SKIP_BOOTSTRAP=no"
     # Use JAVA_OPTS environment variable for this purpose.
     #  - "JAVA_OPTS="
+    # Needed for Remote Build Triger.
+    #  - "JAVA_ARGS=$JAVA_ARGS -Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true"
     ulimits:
       memlock:
         soft: -1

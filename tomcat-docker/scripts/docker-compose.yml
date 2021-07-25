@@ -59,6 +59,10 @@ services:
     # Please note that those files should be writable by the system user of the container.
     # - './conf/server.xml:/opt/bitnami/tomcat/conf/server.xml'
     # 
+    # Modified Bitnami's Tomcat Script for user creation step with manager-script role. 
+    # If you do not need this role, please comment it.
+      - './conf/libtomcat.sh:/opt/bitnami/scripts/libtomcat.sh'
+    # 
     ports:
       - 8080:8080
       - 8443:8443
