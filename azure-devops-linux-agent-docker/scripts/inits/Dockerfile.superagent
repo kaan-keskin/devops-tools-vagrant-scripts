@@ -2,6 +2,8 @@ FROM ubuntu:18.04
 
 USER root
 
+# Source: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops
+
 # To make it easier for build and release pipelines to run apt-get,
 # configure apt to not require confirmation (assume the -y argument by default)
 ENV DEBIAN_FRONTEND=noninteractive
@@ -102,6 +104,10 @@ RUN echo \
     $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 # Update the apt package index, and install the latest version of Docker Engine and containerd, or go to the next step to install a specific version:
 RUN apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Manage Docker as a non-root user
+RUN groupadd docker
+RUN usermod -aG docker $USER
 
 # Install Azure DevOps Required Dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
     dev1.vm.provider :virtualbox do |vb|
       vb.name = "azure-devops-linux-agent-docker-vm"
       vb.memory = 16384
-      vb.cpus = 2
+      vb.cpus = 4
     end
     dev1.vm.network "private_network", ip: "192.168.33.99"
     dev1.vm.synced_folder "./scripts", "/vagrant"
@@ -26,17 +26,18 @@ Vagrant.configure("2") do |config|
       cp -Rf /vagrant/* /azp
       chown -Rf vagrant:vagrant /azp
     SHELL
-    dev1.vm.provision :docker_compose, rebuild: false, run: "always", 
-      yml: [
-        "/azp/docker-compose.testagent.yml",
-        "/azp/docker-compose.agent.yml",
-        "/azp/docker-compose.superagent.yml"
-      ]
-    dev1.vm.provision "shell", inline: <<-SHELL  
-      sleep 10
-      cd /azp
-      docker-compose -f docker-compose.testagent.yml -f docker-compose.agent.yml -f docker-compose.superagent.yml down
-    SHELL
+    dev1.vm.provision :docker_compose
+    #dev1.vm.provision :docker_compose, rebuild: false, run: "always", 
+    #  yml: [
+    #    "/azp/docker-compose.testagent.yml",
+    #    "/azp/docker-compose.agent.yml",
+    #    "/azp/docker-compose.superagent.yml"
+    #  ]
+    #dev1.vm.provision "shell", inline: <<-SHELL  
+    #  sleep 10
+    #  cd /azp
+    #  docker-compose -f docker-compose.testagent.yml -f docker-compose.agent.yml -f docker-compose.superagent.yml down
+    #SHELL
 
   end
 

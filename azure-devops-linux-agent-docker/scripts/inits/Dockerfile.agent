@@ -2,6 +2,8 @@ FROM ubuntu:18.04
 
 USER root
 
+# Source: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops
+
 # To make it easier for build and release pipelines to run apt-get,
 # configure apt to not require confirmation (assume the -y argument by default)
 ENV DEBIAN_FRONTEND=noninteractive
@@ -61,9 +63,9 @@ RUN mkdir /azp/go/workspace
 RUN export GOPATH=/azp/go/workspace
 RUN rm -rf /azp/go/go1.16.5.linux-amd64.tar.gz
 
-# NodeJS 14 LTS Installation
+# NodeJS 12 LTS Installation
 WORKDIR /azp/nodejs
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get update
 RUN apt-get install -y nodejs
 
