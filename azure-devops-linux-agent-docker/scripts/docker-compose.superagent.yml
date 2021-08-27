@@ -13,8 +13,8 @@ services:
     volumes:
       - './inits/settings.xml:/root/.m2/settings.xml'
       - './inits/sonar-scanner.properties:/azp/sonarscanner/sonar-scanner-4.6.2.2472-linux/conf/sonar-scanner.properties'
-      # Inject Docker Configuration:
-      - './inits/daemon.json:/etc/docker/daemon.json'
+      # Access Docker socket inside the Docker Container.
+      - '/var/run/docker.sock:/var/run/docker.sock'
     environment:
       # Software Tools Env Definitions:
       - "JAVA_HOME=/usr/lib/jvm/java-11-openjdk/"

@@ -63,9 +63,9 @@ RUN mkdir /azp/go/workspace
 RUN export GOPATH=/azp/go/workspace
 RUN rm -rf /azp/go/go1.16.5.linux-amd64.tar.gz
 
-# NodeJS 14 LTS Installation
+# NodeJS 12 LTS Installation
 WORKDIR /azp/nodejs
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get update
 RUN apt-get install -y nodejs
 
@@ -104,10 +104,6 @@ RUN echo \
     $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 # Update the apt package index, and install the latest version of Docker Engine and containerd, or go to the next step to install a specific version:
 RUN apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
-
-# Manage Docker as a non-root user
-RUN groupadd docker
-RUN usermod -aG docker $USER
 
 # Install Azure DevOps Required Dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
