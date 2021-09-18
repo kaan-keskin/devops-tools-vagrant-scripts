@@ -61,6 +61,7 @@ RUN tar -zxvf go1.16.5.linux-amd64.tar.gz -C /usr/local/
 RUN export PATH=${PATH}:/usr/local/go/bin
 RUN mkdir /azp/go/workspace
 RUN export GOPATH=/azp/go/workspace
+ENV GOPATH=/azp/go/workspace
 RUN rm -rf /azp/go/go1.16.5.linux-amd64.tar.gz
 
 # NodeJS 12 LTS Installation
@@ -73,6 +74,7 @@ RUN apt-get install -y nodejs
 RUN apt-get install -y --no-install-recommends openjdk-11-jdk 
 RUN export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 #RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 RUN export PATH=$PATH:$JAVA_HOME/bin
 
 # Maven 3.8.1 Installation
@@ -84,6 +86,7 @@ RUN tar -xvzf apache-maven-3.8.1-bin.tar.gz \
   && mv /usr/share/maven /usr/share/maven-old \ 
   && mv maven /usr/share/
 RUN export M2_HOME=/usr/share/maven
+ENV M2_HOME=/usr/share/maven
 RUN rm -rf /azp/maven/apache-maven-3.8.1-bin.tar.gz
 
 # SonarScanner 4.6.2.2472 Installation
@@ -103,7 +106,7 @@ RUN echo \
     "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
     $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 # Update the apt package index, and install the latest version of Docker Engine and containerd, or go to the next step to install a specific version:
-RUN apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
+RUN apt-get update && apt-get install -y docker-ce-cli
 
 # Install Azure DevOps Required Dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
