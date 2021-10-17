@@ -4,7 +4,7 @@ services:
 
 #-------------------Jenkins-2-Service-------------------
   jenkins2-master:
-    image: 'jenkins:2.60.3-alpine'
+    image: 'jenkins/jenkins:2.316-alpine'
     hostname: jenkins2-master
     container_name: jenkins2-master
     restart: unless-stopped
@@ -44,7 +44,6 @@ services:
       - './jenkins/log.properties:/var/jenkins_home/log.properties'
     # Access Docker socket inside the Docker Container.
       - '/var/run/docker.sock:/var/run/docker.sock'
-      - '/usr/local/bin/docker:/usr/local/bin/docker'
     ports:
       - 8080:8080
     # You can run builds on the master (out of the box) but if you want to attach build slave servers: 
